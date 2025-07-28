@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Western Colorado University Security Log</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f9fafb;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 64rem;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #1e3a8a;
+            color: white;
+            padding: 2rem;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .header p {
+            color: #bfdbfe;
+            margin-top: 0.5rem;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: #f3f4f6;
+            color: #374151;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .tab:hover {
+            background: #e5e7eb;
+        }
+        
+        .tab.active {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .content {
+            padding: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        @media (min-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+        
+        .input, .select, .textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .input:focus, .select:focus, .textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #2563eb;
+            border-color: #2563eb;
+        }
+        
+        .entry-types {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        
+        @media (min-width: 768px) {
+            .entry-types {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+        
+        .entry-type-btn {
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 2px solid #d1d5db;
+            background: white;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .entry-type-btn:hover {
+            border-color: #9ca3af;
+        }
+        
+        .entry-type-btn.active {
+            border-color: transparent;
+            color: white;
+        }
+        
+        .entry-type-btn.active.patrol { background: #3b82f6; }
+        .entry-type-btn.active.incident { background: #ef4444; }
+        .entry-type-btn.active.maintenance { background: #f97316; }
+        .entry-type-btn.active.shift { background: #22c55e; }
+        .entry-type-btn.active.towed { background: #a855f7; }
+        
+        .priority-group {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .priority-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: 2px solid #d1d5db;
+            background: white;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: capitalize;
+        }
+        
+        .priority-btn:hover {
+            border-color: #9ca3af;
+        }
+        
+        .priority-btn.active {
+            color: white;
+        }
+        
+        .priority-btn.active.high {
+            background: #ef4444;
+            border-color: #ef4444;
+        }
+        
+        .priority-btn.active.medium {
+            background: #eab308;
+            border-color: #eab308;
+        }
+        
+        .priority-btn.active.low {
+            background: #22c55e;
+            border-color: #22c55e;
+        }
+        
+        .btn-primary {
+            width: 100%;
+            background: #2563eb;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+        
+        .search-filter {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        @media (min-width: 640px) {
+            .search-filter {
+                flex-direction: row;
+            }
+        }
+        
+        .search-box {
+            flex: 1;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+        }
+        
+        .date-box {
+            width: 12rem;
+        }
+        
+        .date-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+        }
+        
+        .log-entry {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+        }
+        
+        .entry-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .entry-icon {
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: bold;
+            min-width: 2.5rem;
+            text-align: center;
+        }
+        
+        .entry-icon.patrol { background: #3b82f6; }
+        .entry-icon.incident { background: #ef4444; }
+        .entry-icon.maintenance { background: #f97316; }
+        .entry-icon.shift { background: #22c55e; }
+        .entry-icon.towed { background: #a855f7; }
+        
+        .entry-content {
+            flex: 1;
+        }
+        
+        .entry-title {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        @media (min-width: 640px) {
+            .entry-title {
+                flex-direction: row;
+                align-items: center;
+            }
+        }
+        
+        .entry-title h3 {
+            font-weight: 500;
+            color: #111827;
+        }
+        
+        .entry-timestamp {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .entry-details {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 0.75rem;
+        }
+        
+        @media (min-width: 640px) {
+            .entry-details {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .entry-description {
+            color: #374151;
+        }
+        
+        .priority-badge {
+            margin-left: 0.25rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+        }
+        
+        .priority-badge.high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .priority-badge.medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .priority-badge.low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 0;
+            color: #6b7280;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>
+                    🛡️ Western Colorado University Security Log
+                </h1>
+                <p>Digital Security Guard Activity Log</p>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="showNewEntry()">
+                    ➕ New Entry
+                </button>
+                <button class="tab" onclick="showViewLog()">
+                    📋 View Log (<span id="entry-count">0</span>)
+                </button>
+            </div>
+            
+            <div id="new-entry" class="content">
+                <div class="form-group">
+                    <div class="form-row">
+                        <div>
+                            <label class="label">Guard Name *</label>
+                            <input type="text" id="guard-name" class="input" placeholder="Enter your full name">
+                        </div>
+                        <div>
+                            <label class="label">Shift *</label>
+                            <select id="shift" class="select">
+                                <option value="">Select shift</option>
+                                <option value="Day">Day</option>
+                                <option value="Evening">Evening</option>
+                                <option value="Night">Night</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="label">Entry Type *</label>
+                    <div class="entry-types">
+                        <button type="button" class="entry-type-btn active patrol" onclick="selectEntryType('patrol', this)">
+                            🛡️
+                            <span>Patrol Round</span>
+                        </button>
+                        <button type="button" class="entry-type-btn incident" onclick="selectEntryType('incident', this)">
+                            ⚠️
+                            <span>Security Incident</span>
+                        </button>
+                        <button type="button" class="entry-type-btn maintenance" onclick="selectEntryType('maintenance', this)">
+                            🔧
+                            <span>Maintenance Issue</span>
+                        </button>
+                        <button type="button" class="entry-type-btn shift" onclick="selectEntryType('shift', this)">
+                            📝
+                            <span>Shift Notes</span>
+                        </button>
+                        <button type="button" class="entry-type-btn towed" onclick="selectEntryType('towed', this)">
+                            🚗
+                            <span>Towed Vehicle</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="label">Location *</label>
+                    <select id="location" class="select">
+                        <option value="">Select location</option>
+                        <option value="Dolores Hall">Dolores Hall</option>
+                        <option value="Colorado Hall">Colorado Hall</option>
+                        <option value="Tomichi Hall">Tomichi Hall</option>
+                        <option value="Crystal Hall">Crystal Hall</option>
+                        <option value="Ute Hall">Ute Hall</option>
+                        <option value="Mears">Mears</option>
+                        <option value="Moffat">Moffat</option>
+                        <option value="Robidoux">Robidoux</option>
+                        <option value="Chipeta">Chipeta</option>
+                        <option value="Pinnacles">Pinnacles</option>
+                        <option value="Field House">Field House</option>
+                        <option value="Taylor Hall">Taylor Hall</option>
+                        <option value="Kelley">Kelley</option>
+                        <option value="Hurst">Hurst</option>
+                        <option value="Quigley">Quigley</option>
+                        <option value="Paul Wright Gym">Paul Wright Gym</option>
+                        <option value="Library">Library</option>
+                        <option value="Crawford">Crawford</option>
+                        <option value="Alumni Visitors">Alumni Visitors</option>
+                        <option value="Mountaineer Bowl">Mountaineer Bowl</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div id="priority-section" class="form-group hidden">
+                    <label class="label">Priority Level</label>
+                    <div class="priority-group">
+                        <button type="button" class="priority-btn active low" onclick="selectPriority('low', this)">Low</button>
+                        <button type="button" class="priority-btn medium" onclick="selectPriority('medium', this)">Medium</button>
+                        <button type="button" class="priority-btn high" onclick="selectPriority('high', this)">High</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="label">Description *</label>
+                    <textarea id="description" class="textarea" rows="4" placeholder="Detailed description of the entry..."></textarea>
+                </div>
+                
+                <button type="button" onclick="addEntry()" class="btn-primary">
+                    ➕ Add Entry
+                </button>
+            </div>
+            
+            <div id="view-log" class="content hidden">
+                <div class="search-filter">
+                    <div class="search-box">
+                        <input type="text" id="search-input" class="search-input" placeholder="🔍 Search entries..." onkeyup="filterEntries()">
+                    </div>
+                    <div class="date-box">
+                        <input type="date" id="date-filter" class="date-input" onchange="filterEntries()">
+                    </div>
+                </div>
+                
+                <div id="log-entries">
+                    <div class="empty-state">
+                        <p>📋 No entries found</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Global variables
+        var entries = [];
+        var currentEntryType = 'patrol';
+        var currentPriority = 'low';
+        
+        var entryTypes = {
+            patrol: { icon: '🛡️', color: 'patrol', label: 'Patrol Round' },
+            incident: { icon: '⚠️', color: 'incident', label: 'Security Incident' },
+            maintenance: { icon: '🔧', color: 'maintenance', label: 'Maintenance Issue' },
+            shift: { icon: '📝', color: 'shift', label: 'Shift Notes' },
+            towed: { icon: '🚗', color: 'towed', label: 'Towed Vehicle' }
+        };
+        
+        // Initialize
+        function init() {
+            document.getElementById('date-filter').value = new Date().toISOString().split('T')[0];
+            updateEntryCount();
+        }
+        
+        // Tab functions
+        function showNewEntry() {
+            document.querySelector('.tab.active').classList.remove('active');
+            document.querySelectorAll('.tab')[0].classList.add('active');
+            document.getElementById('new-entry').classList.remove('hidden');
+            document.getElementById('view-log').classList.add('hidden');
+        }
+        
+        function showViewLog() {
+            document.querySelector('.tab.active').classList.remove('active');
+            document.querySelectorAll('.tab')[1].classList.add('active');
+            document.getElementById('view-log').classList.remove('hidden');
+            document.getElementById('new-entry').classList.add('hidden');
+            renderEntries();
+        }
+        
+        // Entry type selection
+        function selectEntryType(type, button) {
+            // Remove active from all entry type buttons
+            var buttons = document.querySelectorAll('.entry-type-btn');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('active');
+            }
+            
+            // Add active to clicked button
+            button.classList.add('active');
+            currentEntryType = type;
+            
+            // Show/hide priority section
+            var prioritySection = document.getElementById('priority-section');
+            if (type === 'incident' || type === 'maintenance' || type === 'towed') {
+                prioritySection.classList.remove('hidden');
+            } else {
+                prioritySection.classList.add('hidden');
+            }
+        }
+        
+        // Priority selection
+        function selectPriority(priority, button) {
+            // Remove active from all priority buttons
+            var buttons = document.querySelectorAll('.priority-btn');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('active');
+            }
+            
+            // Add active to clicked button
+            button.classList.add('active');
+            currentPriority = priority;
+        }
+        
+        // Add entry
+        function addEntry() {
+            var guardName = document.getElementById('guard-name').value;
+            var shift = document.getElementById('shift').value;
+            var location = document.getElementById('location').value;
+            var description = document.getElementById('description').value;
+            
+            if (!guardName || !shift || !location || !description) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            var entry = {
+                id: Date.now(),
+                guardName: guardName,
+                shift: shift,
+                type: currentEntryType,
+                location: location,
+                description: description,
+                priority: (currentEntryType === 'incident' || currentEntryType === 'maintenance' || currentEntryType === 'towed') ? currentPriority : null,
+                timestamp: new Date().toISOString(),
+                date: new Date().toISOString().split('T')[0]
+            };
+            
+            entries.unshift(entry);
+            updateEntryCount();
+            clearForm();
+            showViewLog();
+        }
+        
+        function clearForm() {
+            document.getElementById('guard-name').value = '';
+            document.getElementById('shift').value = '';
+            document.getElementById('location').value = '';
+            document.getElementById('description').value = '';
+            
+            // Reset to patrol type
+            var buttons = document.querySelectorAll('.entry-type-btn');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('active');
+            }
+            buttons[0].classList.add('active');
+            currentEntryType = 'patrol';
+            document.getElementById('priority-section').classList.add('hidden');
+            
+            // Reset priority
+            var priorityButtons = document.querySelectorAll('.priority-btn');
+            for (var i = 0; i < priorityButtons.length; i++) {
+                priorityButtons[i].classList.remove('active');
+            }
+            priorityButtons[0].classList.add('active');
+            currentPriority = 'low';
+        }
+        
+        function updateEntryCount() {
+            document.getElementById('entry-count').textContent = entries.length;
+        }
+        
+        function filterEntries() {
+            renderEntries();
+        }
+        
+        function renderEntries() {
+            var searchTerm = document.getElementById('search-input').value.toLowerCase();
+            var selectedDate = document.getElementById('date-filter').value;
+            
+            var filteredEntries = entries.filter(function(entry) {
+                var matchesSearch = entry.description.toLowerCase().indexOf(searchTerm) !== -1 ||
+                                  entry.location.toLowerCase().indexOf(searchTerm) !== -1 ||
+                                  entry.guardName.toLowerCase().indexOf(searchTerm) !== -1;
+                var matchesDate = !selectedDate || entry.date === selectedDate;
+                return matchesSearch && matchesDate;
+            });
+            
+            var logEntries = document.getElementById('log-entries');
+            
+            if (filteredEntries.length === 0) {
+                logEntries.innerHTML = '<div class="empty-state"><p>📋 No entries found</p></div>';
+                return;
+            }
+            
+            var html = '';
+            for (var i = 0; i < filteredEntries.length; i++) {
+                var entry = filteredEntries[i];
+                var entryType = entryTypes[entry.type];
+                var timestamp = new Date(entry.timestamp);
+                var timeStr = timestamp.toLocaleString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+                var dateStr = timestamp.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                
+                html += '<div class="log-entry">';
+                html += '<div class="entry-header">';
+                html += '<div class="entry-icon ' + entryType.color + '">' + entryType.icon + '</div>';
+                html += '<div class="entry-content">';
+                html += '<div class="entry-title">';
+                html += '<h3>' + entryType.label + '</h3>';
+                html += '<span class="entry-timestamp">' + dateStr + ' at ' + timeStr + '</span>';
+                html += '</div>';
+                html += '<div class="entry-details">';
+                html += '<div><strong>Location:</strong> ' + entry.location + '</div>';
+                html += '<div><strong>Guard:</strong> ' + entry.guardName + ' (' + entry.shift + ')</div>';
+                if (entry.priority) {
+                    html += '<div><strong>Priority:</strong> <span class="priority-badge ' + entry.priority + '">' + entry.priority + '</span></div>';
+                }
+                html += '</div>';
+                html += '<p class="entry-description">' + entry.description + '</p>';
+                html += '</div>';
+                html += '</div>';
+                html += '</div>';
+            }
+            
+            logEntries.innerHTML = html;
+        }
+        
+        // Initialize when page loads
+        window.onload = function() {
+            init();
+        };
+    </script>
+</body>
+</html>
